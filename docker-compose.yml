@@ -1,0 +1,22 @@
+version: "2"
+
+# linked services 
+services:
+    web:
+        # install nginx
+        image: nginx:latest
+        ports: 
+            # expose ports
+            - "80:80"
+        volumes:
+            # mount existing folders into : docker folders ( no space before/after colomn)
+            - ../work:/web
+            # mount nginx config in order to make site available
+            - ./test.conf:/etc/nginx/conf.d/test.conf
+            - ./kine.conf:/etc/nginx/conf.d/kine.conf
+        
+    php:
+        image: php:7.0-fpm
+        volumes:
+            - ../work:/web
+            - ./php-fpm.conf:/usr/local/etc/php-fpm.d/phpfpmlog.conf
