@@ -1,7 +1,12 @@
-version: "2"
+version: '3.7'
 
 # linked services 
 services:
+    app: 
+        build:
+            context: ./
+        environment: 
+            XDEBUG_CONFIG: remote_host=${XDEBUG_REMOTE_HOST:-host.docker.internal}
     web:
         # install nginx
         image: nginx:latest
@@ -11,12 +16,20 @@ services:
         volumes:
             # mount existing folders into : docker folders ( no space before/after colomn)
             - ../work:/web
+            # easy access to logs
+            - ./logs/nginx:/var/logs/nginx
             # mount nginx config in order to make site available
-            - ./test.conf:/etc/nginx/conf.d/test.conf
-            - ./kine.conf:/etc/nginx/conf.d/kine.conf
+            - ./conf/nginx/test.conf:/etc/nginx/conf.d/test.conf
+            - ./conf/nginx/kine.conf:/etc/nginx/conf.d/kine.conf
+            - ./conf/nginx/remote.conf:/etc/nginx/conf.d/remote.conf
         
     php:
-        image: php:7.0-fpm
+        # required version of php
+        image: php:7.1-fpm
         volumes:
+            # mount existing folders into : docker folders ( no space before/after colomn)
             - ../work:/web
-            - ./php-fpm.conf:/usr/local/etc/php-fpm.d/phpfpmlog.conf
+            # setup some config
+            - ./logs/php:/var/logs/xdebug
+            - ./conf/php/php-fpm.conf:/usr/local/etc/php-fpm.d/log.conf
+            - ./conf/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
